@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Painel de Registro de Turnos</title>
+<style>
+  :root {
+      --primary-color: #0056b3;
+      --secondary-color: #e9ecef;
+      --background-color: #f8f9fa;
+      --text-color: #343a40;
+      --border-color: #ced4da;
+      --danger-color: #dc3545;
+  }
+
+  body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 40px 20px;
+      background: var(--background-color);
+      color: var(--text-color);
+  }
+
+  .container {
+      max-width: 900px;
+      margin: auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  h1, h2 {
+      text-align: center;
+      color: var(--primary-color);
+      font-weight: 600;
+      margin-bottom: 20px;
+  }
+
+  h2 {
+      border-bottom: 2px solid var(--secondary-color);
+      padding-bottom: 10px;
+      margin-top: 30px;
+  }
+  
+  h3 {
+      color: var(--primary-color);
+      margin-top: 0;
+  }
+
+  label {
+      font-weight: 600;
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 5px;
+  }
+
+  select, input, textarea {
+      width: 100%;
+      padding: 12px;
+      margin: 6px 0;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      box-sizing: border-box;
+      font-size: 16px;
+  }
+
+  select:focus, input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+  }
+
+  .berco, .item-container {
+      margin-top: 20px;
+      padding: 20px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: #fafafa;
+      position: relative;
+  }
+  
+  .item-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      padding: 10px;
+      background: #ffffff;
+      width: 100%;
+      box-sizing: border-box;
+  }
+  
+  .item-container input {
+      flex-grow: 1;
+      margin: 0;
+  }
+
+  button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      color: #ffffff;
+      background: var(--primary-color);
+      transition: background-color 0.3s ease;
+  }
+  
+  button:hover {
+      background: #004494;
+  }
+
+  .remove-btn {
+      background: var(--danger-color);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 0;
+      width: auto;
+  }
+  
+  .remove-btn:hover {
+      background: #c82333;
+  }
+
+  .action-buttons { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 10px; 
+      margin-top: 25px; 
+  }
+  
+  .berco-details {
+    transition: max-height 0.5s ease-in-out;
+    overflow: hidden;
+  }
+  
+  .hidden {
+      max-height: 0;
+      padding: 0 20px;
+      border: none;
+  }
+
+  @media (min-width: 768px) {
+      .action-buttons {
+          flex-direction: row;
+      }
+      .action-buttons button {
+          flex: 1;
+      }
+  }
+
+  /* Estilos para impressão */
+  #printArea {
+      display: none;
+  }
+
+  @media print {
+      body * { visibility: hidden; margin: 0; padding: 0; }
+      #printArea {
+          display: block;
+          visibility: visible;
+          font-size: 12pt;
+          white-space: pre-wrap;
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          padding: 20px;
+          line-height: 1.5;
+          color: black;
+      }
+      #printArea h1, #printArea h2, #printArea h3 {
+          color: black;
+          font-weight: bold;
+      }
+      #printArea * { visibility: visible; }
+  }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body onload="carregarDadosLocal()">
+<div class="container">
+  <h1>Painel de Registro de Turnos</h1>
+
+    <h2>Informações do Turno</h2>
+  <label for="data_turno">Data do Turno:</label>
+  <input type="date" id="data_turno" onchange="salvarDadosLocal()">
+
+  <label for="tipo_turno">Turno:</label>
+  <select id="tipo_turno" onchange="salvarDadosLocal()">
+    <option value="">-- Selecione --</option>
+    <option value="7h-19h">7h-19h</option>
+    <option value="19h-7h">19h-7h</option>
+  </select>
+
+    <h2>Operadores do Turno</h2>
+  <div id="operadores_container">
+    <div class="item-container">
+      <input type="text" class="operador" placeholder="Nome do operador" onchange="salvarDadosLocal()">
+      <button type="button" class="remove-btn" onclick="removerItem(this); salvarDadosLocal();">Remover</button>
+    </div>
+  </div>
+  <button type="button" onclick="adicionarOperador()">Adicionar Operador</button>
+
+    <label for="posto">Selecione o Posto:</label>
+  <select id="posto" onchange="mostrarBerços(); salvarDadosLocal();">
+    <option value="">-- Escolha --</option>
+    <option value="sul">Píer Sul</option>
+    <option value="norte">Píer Norte</option>
+    <option value="controle">Controle</option>
+  </select>
+
+  <div id="bercos"></div>
+
+    <div class="action-buttons">
+    <button onclick="imprimirRelatorio()">Imprimir Relatório</button>
+    <button onclick="salvarPDF()">Salvar em PDF</button>
+    <button onclick="limparFormulario()">Limpar Formulário</button>
+  </div>
+</div>
+
+<script>
+  // Adicionar e remover operadores
+  function adicionarOperador() {
+    const container = document.getElementById("operadores_container");
+    const div = document.createElement("div");
+    div.className = "item-container";
+    div.innerHTML = `
+      <input type="text" class="operador" placeholder="Nome do operador" onchange="salvarDadosLocal()">
+      <button type="button" class="remove-btn" onclick="removerItem(this); salvarDadosLocal();">Remover</button>
+    `;
+    container.appendChild(div);
+    salvarDadosLocal();
+  }
+
+  function removerItem(btn) {
+    btn.parentNode.remove();
+    salvarDadosLocal();
+  }
+
+  // Exibir/Esconder campos do berço
+  function toggleBercoStatus(selectElement) {
+    const bercoDiv = selectElement.closest('.berco');
+    const bercoDetailsDiv = bercoDiv.querySelector('.berco-details');
+    if (selectElement.value === 'vago') {
+      bercoDetailsDiv.style.display = 'none';
+    } else {
+      bercoDetailsDiv.style.display = 'block';
+    }
+    salvarDadosLocal();
+  }
+
+  // Mostrar berços dinamicamente
+  function mostrarBerços() {
+    const posto = document.getElementById("posto").value;
+    const bercosDiv = document.getElementById("bercos");
+    bercosDiv.innerHTML = ""; // Limpa berços antigos
+
+    let bercos = [];
+    if (posto === "sul") bercos = ["P1", "P2"];
+    else if (posto === "norte") bercos = ["P3", "P4"];
+    else if (posto === "controle") bercos = ["P1", "P2", "P3", "P4"];
+
+    bercos.forEach(berco => {
+      const div = document.createElement("div");
+      div.className = "berco";
+      div.id = `berco_${berco}`;
+      div.innerHTML = `
+        <h3>${berco}</h3>
+        <label for="${berco}_status">Status do Berço:</label>
+        <select id="${berco}_status" onchange="toggleBercoStatus(this)">
+          <option value="em_operacao">Em Operação</option>
+          <option value="vago">Vago</option>
+        </select>
+        <div class="berco-details">
+          <label>Navio:</label>
+          <input type="text" id="${berco}_navio" placeholder="Nome do navio" onchange="salvarDadosLocal()">
+          <label>Viagem:</label>
+          <input type="text" id="${berco}_viagem" placeholder="Número da viagem" onchange="salvarDadosLocal()">
+          <label>Operação:</label>
+          <select id="${berco}_operacao" onchange="salvarDadosLocal()">
+            <option value="">-- Selecione --</option>
+            <option value="Carga">Carga</option>
+            <option value="Descarga">Descarga</option>
+            <option value="Transbordo">Transbordo</option>
+            <option value="STS">STS</option>
+          </select>
+          <div id="${berco}_produtos_container">
+            <label>Produto:</label>
+            <div class="item-container">
+              <input type="text" class="${berco}_produto" placeholder="Produto transferido" onchange="salvarDadosLocal()">
+              <button type="button" class="remove-btn" onclick="removerItem(this)">Remover</button>
+            </div>
+          </div>
+          <button type="button" onclick="adicionarProduto('${berco}')">Adicionar Produto</button>
+          <label>Observações:</label>
+          <textarea id="${berco}_obs" rows="3" placeholder="Detalhes do ${berco}..." onchange="salvarDadosLocal()"></textarea>
+        </div>
+      `;
+      bercosDiv.appendChild(div);
+    });
+    salvarDadosLocal();
+  }
+
+  // Adicionar produto
+  function adicionarProduto(berco) {
+    const container = document.getElementById(`${berco}_produtos_container`);
+    const div = document.createElement("div");
+    div.className = "item-container";
+    div.innerHTML = `
+      <input type="text" class="${berco}_produto" placeholder="Produto transferido" onchange="salvarDadosLocal()">
+      <button type="button" class="remove-btn" onclick="removerItem(this)">Remover</button>
+    `;
+    container.appendChild(div);
+    salvarDadosLocal();
+  }
+
+  // Coletar dados
+  function coletarDados() {
+    const data = document.getElementById("data_turno").value;
+    const turno = document.getElementById("tipo_turno").value;
+
+    if (!data || !turno) {
+      alert("Por favor, preencha a Data e o Turno para continuar.");
+      return null;
+    }
+
+    const operadores = Array.from(document.querySelectorAll(".operador"))
+      .map(i => i.value || "Não informado")
+      .join(", ");
+
+    const posto = document.getElementById("posto").value || "Não informado";
+    let dados = `Data: ${data}\nTurno: ${turno}\n\n`;
+    dados += `Posto: ${posto.toUpperCase()}\n`;
+    dados += `Operadores: ${operadores}\n\n`;
+
+    const bercos = document.querySelectorAll(".berco");
+    if (bercos.length > 0) {
+      bercos.forEach(bercoDiv => {
+        const berco = bercoDiv.querySelector("h3").innerText;
+        const status = document.getElementById(`${berco}_status`).value;
+        
+        if (status === "vago") {
+          dados += `${berco}\n`;
+          dados += `- Status: Vago\n\n`;
+        } else {
+          const navio = document.getElementById(`${berco}_navio`).value || "Não informado";
+          const viagem = document.getElementById(`${berco}_viagem`).value || "Não informado";
+          const operacao = document.getElementById(`${berco}_operacao`).value || "Não informado";
+          const produtos = Array.from(bercoDiv.querySelectorAll(`.${berco}_produto`))
+            .map(i => i.value || "Não informado")
+            .join(", ");
+          const obs = document.getElementById(`${berco}_obs`).value || "Sem observações";
+          
+          dados += `${berco}\n`;
+          dados += `- Status: Em Operação\n`;
+          dados += `- Navio: ${navio}\n`;
+          dados += `- Viagem: ${viagem}\n`;
+          dados += `- Operação: ${operacao}\n`;
+          dados += `- Produto(s): ${produtos}\n`;
+          dados += `- Observações: ${obs}\n\n`;
+        }
+      });
+    } else {
+      dados += "Nenhum berço selecionado.\n";
+    }
+
+    return dados;
+  }
+
+  // Impressão
+  function imprimirRelatorio() {
+    const dados = coletarDados();
+    if (dados) {
+      let printArea = document.getElementById('printArea');
+      if (!printArea) {
+        printArea = document.createElement('pre');
+        printArea.id = 'printArea';
+        document.body.appendChild(printArea);
+      }
+      printArea.innerText = dados;
+      window.print();
+    }
+  }
+
+  // PDF
+  async function salvarPDF() {
+    const dados = coletarDados();
+    if (dados) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      const linhas = doc.splitTextToSize(dados, 180);
+      doc.text(linhas, 10, 20);
+      doc.save("relatorio_turno.pdf");
+    }
+  }
+
+  // Limpar formulário
+  function limparFormulario() {
+    document.getElementById("data_turno").value = "";
+    document.getElementById("tipo_turno").value = "";
+    document.getElementById("posto").value = "";
+    document.getElementById("operadores_container").innerHTML = `
+      <div class="item-container">
+        <input type="text" class="operador" placeholder="Nome do operador" onchange="salvarDadosLocal()">
+        <button type="button" class="remove-btn" onclick="removerItem(this); salvarDadosLocal();">Remover</button>
+      </div>
+    `;
+    document.getElementById("bercos").innerHTML = "";
+    localStorage.removeItem('dadosTurno');
+    alert("Formulário limpo com sucesso!");
+  }
+
+  // Salvar dados no localStorage
+  function salvarDadosLocal() {
+    const dadosForm = {
+      data: document.getElementById("data_turno").value,
+      turno: document.getElementById("tipo_turno").value,
+      operadores: Array.from(document.querySelectorAll(".operador")).map(i => i.value),
+      posto: document.getElementById("posto").value,
+      bercos: []
+    };
+
+    const bercosElements = document.querySelectorAll(".berco");
+    bercosElements.forEach(bercoDiv => {
+      const berco = bercoDiv.querySelector("h3").innerText;
+      const status = document.getElementById(`${berco}_status`).value;
+      
+      const bercoData = {
+        berco,
+        status,
+        navio: document.getElementById(`${berco}_navio`)?.value || '',
+        viagem: document.getElementById(`${berco}_viagem`)?.value || '',
+        operacao: document.getElementById(`${berco}_operacao`)?.value || '',
+        produtos: Array.from(bercoDiv.querySelectorAll(`.${berco}_produto`)).map(i => i.value),
+        obs: document.getElementById(`${berco}_obs`)?.value || ''
+      };
+      dadosForm.bercos.push(bercoData);
+    });
+
+    localStorage.setItem('dadosTurno', JSON.stringify(dadosForm));
+  }
+
+  // Carregar dados do localStorage
+  function carregarDadosLocal() {
+    const dadosSalvos = localStorage.getItem('dadosTurno');
+    if (dadosSalvos) {
+      const dados = JSON.parse(dadosSalvos);
+      document.getElementById("data_turno").value = dados.data || "";
+      document.getElementById("tipo_turno").value = dados.turno || "";
+      
+      // Carregar operadores
+      const operadoresContainer = document.getElementById("operadores_container");
+      operadoresContainer.innerHTML = "";
+      if (dados.operadores && dados.operadores.length > 0) {
+        dados.operadores.forEach(operador => {
+          const div = document.createElement("div");
+          div.className = "item-container";
+          div.innerHTML = `
+            <input type="text" class="operador" placeholder="Nome do operador" value="${operador}" onchange="salvarDadosLocal()">
+            <button type="button" class="remove-btn" onclick="removerItem(this); salvarDadosLocal();">Remover</button>
+          `;
+          operadoresContainer.appendChild(div);
+        });
+      } else {
+        operadoresContainer.innerHTML = `
+          <div class="item-container">
+            <input type="text" class="operador" placeholder="Nome do operador" onchange="salvarDadosLocal()">
+            <button type="button" class="remove-btn" onclick="removerItem(this); salvarDadosLocal();">Remover</button>
+          </div>
+        `;
+      }
+
+      // Carregar posto e berços
+      document.getElementById("posto").value = dados.posto || "";
+      
+      if (dados.posto) {
+        mostrarBerços();
+        
+        dados.bercos.forEach(bercoData => {
+          const bercoStatusSelect = document.getElementById(`${bercoData.berco}_status`);
+          if (bercoStatusSelect) {
+            bercoStatusSelect.value = bercoData.status;
+            toggleBercoStatus(bercoStatusSelect);
+          }
+          
+          if (bercoData.status !== 'vago') {
+            if (document.getElementById(`${bercoData.berco}_navio`)) {
+              document.getElementById(`${bercoData.berco}_navio`).value = bercoData.navio;
+              document.getElementById(`${bercoData.berco}_viagem`).value = bercoData.viagem;
+              document.getElementById(`${bercoData.berco}_operacao`).value = bercoData.operacao;
+              document.getElementById(`${bercoData.berco}_obs`).value = bercoData.obs;
+
+              const produtosContainer = document.getElementById(`${bercoData.berco}_produtos_container`);
+              produtosContainer.innerHTML = "";
+              bercoData.produtos.forEach(produto => {
+                const div = document.createElement("div");
+                div.className = "item-container";
+                div.innerHTML = `
+                  <input type="text" class="${bercoData.berco}_produto" placeholder="Produto transferido" value="${produto}" onchange="salvarDadosLocal()">
+                  <button type="button" class="remove-btn" onclick="removerItem(this)">Remover</button>
+                `;
+                produtosContainer.appendChild(div);
+              });
+            }
+          }
+        });
+      }
+    }
+  }
+</script>
+</body>
+</html>
