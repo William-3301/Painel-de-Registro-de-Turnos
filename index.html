@@ -2,82 +2,165 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Painel de Registro de Turnos</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel de Registro de Turnos Portuários</title>
 <style>
   :root {
       --primary-color: #0056b3;
+      --primary-dark: #004494;
       --secondary-color: #e9ecef;
       --background-color: #f8f9fa;
       --text-color: #343a40;
       --border-color: #ced4da;
       --danger-color: #dc3545;
+      --success-color: #28a745;
+      --warning-color: #ffc107;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+  }
+
+  * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
   }
 
   body {
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
-      padding: 40px 20px;
-      background: var(--background-color);
+      padding: 20px;
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
       color: var(--text-color);
+      min-height: 100vh;
+      line-height: 1.6;
   }
 
   .container {
-      max-width: 900px;
-      margin: auto;
+      max-width: 1000px;
+      margin: 0 auto;
       background: #ffffff;
       padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
   }
 
-  h1, h2 {
+  .container::before {
+      content: "⚓";
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 40px;
+      opacity: 0.1;
+      z-index: 0;
+  }
+
+  .header {
+      text-align: center;
+      margin-bottom: 30px;
+      position: relative;
+      z-index: 1;
+  }
+
+  h1 {
+      color: var(--primary-color);
+      font-weight: 700;
+      margin-bottom: 10px;
+      font-size: 2.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+  }
+
+  h1::before, h1::after {
+      content: "⛴️";
+      font-size: 1.8rem;
+      opacity: 0.8;
+  }
+
+  h2 {
       text-align: center;
       color: var(--primary-color);
       font-weight: 600;
       margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--secondary-color);
+      margin-top: 30px;
+      position: relative;
   }
 
-  h2 {
-      border-bottom: 2px solid var(--secondary-color);
-      padding-bottom: 10px;
-      margin-top: 30px;
+  h2::after {
+      content: "";
+      position: absolute;
+      bottom: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background: var(--primary-color);
   }
   
   h3 {
       color: var(--primary-color);
       margin-top: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+  }
+
+  h3::before {
+      content: "📍";
+  }
+
+  .section {
+      margin-bottom: 30px;
+      transition: var(--transition);
   }
 
   label {
       font-weight: 600;
       display: block;
       margin-top: 15px;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
+      color: var(--text-color);
+      transition: var(--transition);
   }
 
   select, input, textarea {
       width: 100%;
-      padding: 12px;
+      padding: 14px;
       margin: 6px 0;
-      border-radius: 8px;
+      border-radius: 10px;
       border: 1px solid var(--border-color);
       box-sizing: border-box;
       font-size: 16px;
+      transition: var(--transition);
+      background: #fff;
   }
 
   select:focus, input:focus, textarea:focus {
       outline: none;
       border-color: var(--primary-color);
       box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+      transform: translateY(-2px);
   }
 
   .berco, .item-container {
       margin-top: 20px;
       padding: 20px;
       border: 1px solid var(--border-color);
-      border-radius: 8px;
+      border-radius: 12px;
       background: #fafafa;
       position: relative;
+      transition: var(--transition);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  }
+
+  .berco:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
   }
   
   .item-container {
@@ -85,10 +168,11 @@
       align-items: center;
       gap: 10px;
       margin-top: 10px;
-      padding: 10px;
+      padding: 15px;
       background: #ffffff;
       width: 100%;
       box-sizing: border-box;
+      border-radius: 10px;
   }
   
   .item-container input {
@@ -98,55 +182,118 @@
 
   button {
       width: 100%;
-      padding: 12px;
+      padding: 14px;
       margin-top: 15px;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-weight: 600;
       cursor: pointer;
       color: #ffffff;
       background: var(--primary-color);
-      transition: background-color 0.3s ease;
+      transition: var(--transition);
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
   }
   
   button:hover {
-      background: #004494;
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
   }
 
   .remove-btn {
       background: var(--danger-color);
       color: white;
       border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
+      padding: 10px 14px;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 14px;
       margin: 0;
       width: auto;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 5px;
   }
   
   .remove-btn:hover {
       background: #c82333;
+      transform: scale(1.05);
   }
 
   .action-buttons { 
       display: flex; 
       flex-direction: column; 
-      gap: 10px; 
-      margin-top: 25px; 
+      gap: 12px; 
+      margin-top: 30px; 
+  }
+
+  .action-buttons button {
+      margin-top: 0;
   }
   
   .berco-details {
-    transition: max-height 0.5s ease-in-out;
-    overflow: hidden;
+      transition: max-height 0.5s ease-in-out, opacity 0.3s ease;
+      overflow: hidden;
+      max-height: 1000px;
+      opacity: 1;
   }
   
-  .hidden {
+  .berco-details.hidden {
       max-height: 0;
-      padding: 0 20px;
+      opacity: 0;
+      padding: 0;
+      margin: 0;
       border: none;
   }
 
+  .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-left: 10px;
+  }
+
+  .status-operacao {
+      background: #e7f4e4;
+      color: var(--success-color);
+  }
+
+  .status-vago {
+      background: #fff3cd;
+      color: var(--warning-color);
+  }
+
+  /* Ícones nos botões */
+  .btn-icon::before {
+      font-size: 18px;
+  }
+
+  .btn-print::before {
+      content: "🖨️";
+  }
+
+  .btn-pdf::before {
+      content: "📄";
+  }
+
+  .btn-clear::before {
+      content: "🗑️";
+  }
+
+  .btn-add::before {
+      content: "➕";
+  }
+
+  /* Responsividade */
   @media (min-width: 768px) {
       .action-buttons {
           flex-direction: row;
@@ -154,6 +301,90 @@
       .action-buttons button {
           flex: 1;
       }
+      
+      .form-row {
+          display: flex;
+          gap: 15px;
+      }
+      
+      .form-row > div {
+          flex: 1;
+      }
+  }
+
+  @media (max-width: 767px) {
+      body {
+          padding: 10px;
+      }
+      
+      .container {
+          padding: 20px 15px;
+          border-radius: 12px;
+      }
+      
+      h1 {
+          font-size: 1.8rem;
+          flex-direction: column;
+          gap: 5px;
+      }
+      
+      h1::before, h1::after {
+          font-size: 1.5rem;
+      }
+      
+      h2 {
+          font-size: 1.4rem;
+      }
+      
+      .berco, .item-container {
+          padding: 15px;
+      }
+      
+      .item-container {
+          flex-direction: column;
+          align-items: stretch;
+      }
+      
+      .item-container .remove-btn {
+          align-self: flex-end;
+          width: auto;
+      }
+      
+      select, input, textarea {
+          padding: 12px;
+      }
+  }
+
+  @media (max-width: 480px) {
+      h1 {
+          font-size: 1.5rem;
+      }
+      
+      h2 {
+          font-size: 1.3rem;
+      }
+      
+      .container {
+          padding: 15px 10px;
+      }
+      
+      h3 {
+          font-size: 1.1rem;
+      }
+  }
+
+  /* Animações */
+  @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section {
+      animation: fadeIn 0.5s ease forwards;
+  }
+
+  .berco {
+      animation: fadeIn 0.5s ease forwards;
   }
 
   /* Estilos para impressão */
@@ -162,7 +393,19 @@
   }
 
   @media print {
-      body * { visibility: hidden; margin: 0; padding: 0; }
+      body * { 
+          visibility: hidden; 
+          margin: 0; 
+          padding: 0; 
+          background: white !important;
+          color: black !important;
+      }
+      
+      .container {
+          box-shadow: none;
+          max-width: 100%;
+      }
+      
       #printArea {
           display: block;
           visibility: visible;
@@ -176,345 +419,449 @@
           line-height: 1.5;
           color: black;
       }
+      
       #printArea h1, #printArea h2, #printArea h3 {
           color: black;
           font-weight: bold;
       }
-      #printArea * { visibility: visible; }
+      
+      #printArea * { 
+          visibility: visible; 
+      }
+      
+      button, .remove-btn, .action-buttons {
+          display: none !important;
+      }
+  }
+
+  /* Loading state */
+  .loading {
+      opacity: 0.7;
+      pointer-events: none;
+  }
+
+  /* Notificações */
+  .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 15px 20px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      z-index: 1000;
+      transform: translateX(150%);
+      transition: transform 0.3s ease;
+  }
+
+  .notification.show {
+      transform: translateX(0);
+  }
+
+  .notification.success {
+      background: var(--success-color);
+  }
+
+  .notification.error {
+      background: var(--danger-color);
   }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body onload="carregarDadosLocal()">
 <div class="container">
-  <h1>Painel de Registro de Turnos</h1>
+  <div class="header">
+    <h1>Painel de Registro de Turnos Portuários</h1>
+    <p>Sistema de controle operacional - Terminais</p>
+  </div>
 
-    <h2>Informações do Turno</h2>
-  <label for="data_turno">Data do Turno:</label>
-  <input type="date" id="data_turno" onchange="salvarDadosLocal()">
+  <div class="section">
+    <h2>Informações do Turno</h2>
+    <div class="form-row">
+      <div>
+        <label for="data_turno">📅 Data do Turno:</label>
+        <input type="date" id="data_turno" onchange="salvarDadosLocal()">
+      </div>
+      <div>
+        <label for="tipo_turno">🕐 Turno:</label>
+        <select id="tipo_turno" onchange="salvarDadosLocal()">
+          <option value="">-- Selecione --</option>
+          <option value="7h-19h">7h-19h</option>
+          <option value="19h-7h">19h-7h</option>
+        </select>
+      </div>
+    </div>
+  </div>
 
-  <label for="tipo_turno">Turno:</label>
-  <select id="tipo_turno" onchange="salvarDadosLocal()">
-    <option value="">-- Selecione --</option>
-    <option value="7h-19h">7h-19h</option>
-    <option value="19h-7h">19h-7h</option>
-  </select>
+  <div class="section">
+    <h2>👥 Operadores do Turno</h2>
+    <div id="operadores_container">
+      <div class="item-container">
+        <input type="text" class="operador" placeholder="Nome do operador" onchange="salvarDadosLocal()">
+        <button type="button" class="remove-btn" onclick="removerItem(this); salvarDadosLocal();">🗑️ Remover</button>
+      </div>
+    </div>
+    <button type="button" onclick="adicionarOperador()" class="btn-add">Adicionar Operador</button>
+  </div>
 
-    <h2>Operadores do Turno</h2>
-  <div id="operadores_container">
-    <div class="item-container">
-      <input type="text" class="operador" placeholder="Nome do operador" onchange="salvarDadosLocal()">
-      <button type="button" class="remove-btn" onclick="removerItem(this); salvarDadosLocal();">Remover</button>
-    </div>
-  </div>
-  <button type="button" onclick="adicionarOperador()">Adicionar Operador</button>
+  <div class="section">
+    <label for="posto">🏢 Selecione o Posto:</label>
+    <select id="posto" onchange="mostrarBerços(); salvarDadosLocal();">
+      <option value="">-- Escolha --</option>
+      <option value="sul">⛵ Píer Sul</option>
+      <option value="norte">🚢 Píer Norte</option>
+      <option value="controle">🏗️ Controle</option>
+    </select>
+  </div>
 
-    <label for="posto">Selecione o Posto:</label>
-  <select id="posto" onchange="mostrarBerços(); salvarDadosLocal();">
-    <option value="">-- Escolha --</option>
-    <option value="sul">Píer Sul</option>
-    <option value="norte">Píer Norte</option>
-    <option value="controle">Controle</option>
-  </select>
+  <div id="bercos"></div>
 
-  <div id="bercos"></div>
-
-    <div class="action-buttons">
-    <button onclick="imprimirRelatorio()">Imprimir Relatório</button>
-    <button onclick="salvarPDF()">Salvar em PDF</button>
-    <button onclick="limparFormulario()">Limpar Formulário</button>
-  </div>
+  <div class="action-buttons">
+    <button onclick="imprimirRelatorio()" class="btn-print">Imprimir Relatório</button>
+    <button onclick="salvarPDF()" class="btn-pdf">Salvar em PDF</button>
+    <button onclick="limparFormulario()" class="btn-clear">Limpar Formulário</button>
+  </div>
 </div>
 
-<script>
-  // Adicionar e remover operadores
-  function adicionarOperador() {
-    const container = document.getElementById("operadores_container");
-    const div = document.createElement("div");
-    div.className = "item-container";
-    div.innerHTML = `
-      <input type="text" class="operador" placeholder="Nome do operador" onchange="salvarDadosLocal()">
-      <button type="button" class="remove-btn" onclick="removerItem(this); salvarDadosLocal();">Remover</button>
-    `;
-    container.appendChild(div);
-    salvarDadosLocal();
-  }
+<div id="notification" class="notification"></div>
 
-  function removerItem(btn) {
-    btn.parentNode.remove();
-    salvarDadosLocal();
-  }
+<script>
+  // Adicionar e remover operadores
+  function adicionarOperador() {
+    const container = document.getElementById("operadores_container");
+    const div = document.createElement("div");
+    div.className = "item-container";
+    div.innerHTML = `
+      <input type="text" class="operador" placeholder="Nome do operador" onchange="salvarDadosLocal()">
+      <button type="button" class="remove-btn" onclick="removerItem(this); salvarDadosLocal();">🗑️ Remover</button>
+    `;
+    container.appendChild(div);
+    salvarDadosLocal();
+    mostrarNotificacao('Operador adicionado com sucesso!', 'success');
+  }
+
+  function removerItem(btn) {
+    btn.parentNode.remove();
+    salvarDadosLocal();
+    mostrarNotificacao('Item removido com sucesso!', 'success');
+  }
 
   // Exibir/Esconder campos do berço
   function toggleBercoStatus(selectElement) {
     const bercoDiv = selectElement.closest('.berco');
     const bercoDetailsDiv = bercoDiv.querySelector('.berco-details');
     if (selectElement.value === 'vago') {
-      bercoDetailsDiv.style.display = 'none';
+      bercoDetailsDiv.classList.add('hidden');
     } else {
-      bercoDetailsDiv.style.display = 'block';
+      bercoDetailsDiv.classList.remove('hidden');
     }
     salvarDadosLocal();
   }
 
-  // Mostrar berços dinamicamente
-  function mostrarBerços() {
-    const posto = document.getElementById("posto").value;
-    const bercosDiv = document.getElementById("bercos");
-    bercosDiv.innerHTML = ""; // Limpa berços antigos
+  // Mostrar berços dinamicamente
+  function mostrarBerços() {
+    const posto = document.getElementById("posto").value;
+    const bercosDiv = document.getElementById("bercos");
+    bercosDiv.innerHTML = ""; // Limpa berços antigos
 
-    let bercos = [];
-    if (posto === "sul") bercos = ["P1", "P2"];
-    else if (posto === "norte") bercos = ["P3", "P4"];
-    else if (posto === "controle") bercos = ["P1", "P2", "P3", "P4"];
+    let bercos = [];
+    if (posto === "sul") bercos = ["P1", "P2"];
+    else if (posto === "norte") bercos = ["P3", "P4"];
+    else if (posto === "controle") bercos = ["P1", "P2", "P3", "P4"];
 
-    bercos.forEach(berco => {
-      const div = document.createElement("div");
-      div.className = "berco";
-      div.id = `berco_${berco}`;
-      div.innerHTML = `
-        <h3>${berco}</h3>
+    bercos.forEach(berco => {
+      const div = document.createElement("div");
+      div.className = "berco";
+      div.id = `berco_${berco}`;
+      div.innerHTML = `
+        <h3>Berço ${berco}</h3>
         <label for="${berco}_status">Status do Berço:</label>
         <select id="${berco}_status" onchange="toggleBercoStatus(this)">
           <option value="em_operacao">Em Operação</option>
           <option value="vago">Vago</option>
         </select>
-        <div class="berco-details">
-          <label>Navio:</label>
+        <div class="berco-details">
+          <label>🚢 Navio:</label>
           <input type="text" id="${berco}_navio" placeholder="Nome do navio" onchange="salvarDadosLocal()">
-          <label>Viagem:</label>
+          <label>🧭 Viagem:</label>
           <input type="text" id="${berco}_viagem" placeholder="Número da viagem" onchange="salvarDadosLocal()">
-          <label>Operação:</label>
+          <label>⚙️ Operação:</label>
           <select id="${berco}_operacao" onchange="salvarDadosLocal()">
             <option value="">-- Selecione --</option>
-            <option value="Carga">Carga</option>
-            <option value="Descarga">Descarga</option>
-            <option value="Transbordo">Transbordo</option>
-            <option value="STS">STS</option>
+            <option value="Carga">📦 Carga</option>
+            <option value="Descarga">📤 Descarga</option>
+            <option value="Transbordo Carga">🔄 Transbordo Carga</option>
+            <option value="Transbordo Descarga">🔀 Transbordo Descarga</option>
+            <option value="STS">⚓ STS</option>
           </select>
           <div id="${berco}_produtos_container">
-            <label>Produto:</label>
+            <label>📋 Produto:</label>
             <div class="item-container">
               <input type="text" class="${berco}_produto" placeholder="Produto transferido" onchange="salvarDadosLocal()">
-              <button type="button" class="remove-btn" onclick="removerItem(this)">Remover</button>
+              <button type="button" class="remove-btn" onclick="removerItem(this)">🗑️ Remover</button>
             </div>
           </div>
-          <button type="button" onclick="adicionarProduto('${berco}')">Adicionar Produto</button>
-          <label>Observações:</label>
-          <textarea id="${berco}_obs" rows="3" placeholder="Detalhes do ${berco}..." onchange="salvarDadosLocal()"></textarea>
+          <button type="button" onclick="adicionarProduto('${berco}')" class="btn-add">Adicionar Produto</button>
+          <label>📝 Observações:</label>
+          <textarea id="${berco}_obs" rows="3" placeholder="Detalhes do berço ${berco}..." onchange="salvarDadosLocal()"></textarea>
         </div>
-      `;
-      bercosDiv.appendChild(div);
-    });
-    salvarDadosLocal();
-  }
+      `;
+      bercosDiv.appendChild(div);
+    });
+    salvarDadosLocal();
+    if (bercos.length > 0) {
+      mostrarNotificacao(`${bercos.length} berço(s) carregado(s)`, 'success');
+    }
+  }
 
-  // Adicionar produto
-  function adicionarProduto(berco) {
-    const container = document.getElementById(`${berco}_produtos_container`);
-    const div = document.createElement("div");
-    div.className = "item-container";
-    div.innerHTML = `
-      <input type="text" class="${berco}_produto" placeholder="Produto transferido" onchange="salvarDadosLocal()">
-      <button type="button" class="remove-btn" onclick="removerItem(this)">Remover</button>
-    `;
-    container.appendChild(div);
-    salvarDadosLocal();
-  }
+  // Adicionar produto
+  function adicionarProduto(berco) {
+    const container = document.getElementById(`${berco}_produtos_container`);
+    const div = document.createElement("div");
+    div.className = "item-container";
+    div.innerHTML = `
+      <input type="text" class="${berco}_produto" placeholder="Produto transferido" onchange="salvarDadosLocal()">
+      <button type="button" class="remove-btn" onclick="removerItem(this)">🗑️ Remover</button>
+    `;
+    container.appendChild(div);
+    salvarDadosLocal();
+    mostrarNotificacao('Produto adicionado com sucesso!', 'success');
+  }
 
-  // Coletar dados
-  function coletarDados() {
-    const data = document.getElementById("data_turno").value;
-    const turno = document.getElementById("tipo_turno").value;
+  // Coletar dados
+  function coletarDados() {
+    const data = document.getElementById("data_turno").value;
+    const turno = document.getElementById("tipo_turno").value;
 
-    if (!data || !turno) {
-      alert("Por favor, preencha a Data e o Turno para continuar.");
-      return null;
-    }
+    if (!data || !turno) {
+      mostrarNotificacao('Por favor, preencha a Data e o Turno para continuar.', 'error');
+      return null;
+    }
 
-    const operadores = Array.from(document.querySelectorAll(".operador"))
-      .map(i => i.value || "Não informado")
-      .join(", ");
+    const operadores = Array.from(document.querySelectorAll(".operador"))
+      .map(i => i.value || "Não informado")
+      .join(", ");
 
-    const posto = document.getElementById("posto").value || "Não informado";
-    let dados = `Data: ${data}\nTurno: ${turno}\n\n`;
-    dados += `Posto: ${posto.toUpperCase()}\n`;
-    dados += `Operadores: ${operadores}\n\n`;
+    const posto = document.getElementById("posto").value || "Não informado";
+    let dados = `PAINEL DE REGISTRO DE TURNOS PORTUÁRIOS\n`;
+    dados += `============================================\n\n`;
+    dados += `Data: ${data}\nTurno: ${turno}\n\n`;
+    dados += `Posto: ${posto.toUpperCase()}\n`;
+    dados += `Operadores: ${operadores}\n\n`;
+    dados += `DETALHES DOS BERÇOS:\n`;
+    dados += `-------------------\n\n`;
 
-    const bercos = document.querySelectorAll(".berco");
-    if (bercos.length > 0) {
-      bercos.forEach(bercoDiv => {
-        const berco = bercoDiv.querySelector("h3").innerText;
-        const status = document.getElementById(`${berco}_status`).value;
-        
-        if (status === "vago") {
-          dados += `${berco}\n`;
-          dados += `- Status: Vago\n\n`;
-        } else {
-          const navio = document.getElementById(`${berco}_navio`).value || "Não informado";
-          const viagem = document.getElementById(`${berco}_viagem`).value || "Não informado";
-          const operacao = document.getElementById(`${berco}_operacao`).value || "Não informado";
-          const produtos = Array.from(bercoDiv.querySelectorAll(`.${berco}_produto`))
-            .map(i => i.value || "Não informado")
-            .join(", ");
-          const obs = document.getElementById(`${berco}_obs`).value || "Sem observações";
-          
-          dados += `${berco}\n`;
-          dados += `- Status: Em Operação\n`;
-          dados += `- Navio: ${navio}\n`;
-          dados += `- Viagem: ${viagem}\n`;
-          dados += `- Operação: ${operacao}\n`;
-          dados += `- Produto(s): ${produtos}\n`;
-          dados += `- Observações: ${obs}\n\n`;
-        }
-      });
-    } else {
-      dados += "Nenhum berço selecionado.\n";
-    }
+    const bercos = document.querySelectorAll(".berco");
+    if (bercos.length > 0) {
+      bercos.forEach(bercoDiv => {
+        const berco = bercoDiv.querySelector("h3").innerText;
+        const status = document.getElementById(`${berco.split(' ')[1]}_status`).value;
+        
+        if (status === "vago") {
+          dados += `${berco}\n`;
+          dados += `- Status: Vago\n\n`;
+        } else {
+          const navio = document.getElementById(`${berco.split(' ')[1]}_navio`).value || "Não informado";
+          const viagem = document.getElementById(`${berco.split(' ')[1]}_viagem`).value || "Não informado";
+          const operacao = document.getElementById(`${berco.split(' ')[1]}_operacao`).value || "Não informado";
+          const produtos = Array.from(bercoDiv.querySelectorAll(`.${berco.split(' ')[1]}_produto`))
+            .map(i => i.value || "Não informado")
+            .join(", ");
+          const obs = document.getElementById(`${berco.split(' ')[1]}_obs`).value || "Sem observações";
+          
+          dados += `${berco}\n`;
+          dados += `- Status: Em Operação\n`;
+          dados += `- Navio: ${navio}\n`;
+          dados += `- Viagem: ${viagem}\n`;
+          dados += `- Operação: ${operacao}\n`;
+          dados += `- Produto(s): ${produtos}\n`;
+          dados += `- Observações: ${obs}\n\n`;
+        }
+      });
+    } else {
+      dados += "Nenhum berço selecionado.\n";
+    }
 
-    return dados;
-  }
+    dados += `\n============================================\n`;
+    dados += `Relatório gerado em: ${new Date().toLocaleString('pt-BR')}`;
 
-  // Impressão
-  function imprimirRelatorio() {
-    const dados = coletarDados();
-    if (dados) {
-      let printArea = document.getElementById('printArea');
-      if (!printArea) {
-        printArea = document.createElement('pre');
-        printArea.id = 'printArea';
-        document.body.appendChild(printArea);
-      }
-      printArea.innerText = dados;
-      window.print();
-    }
-  }
+    return dados;
+  }
 
-  // PDF
-  async function salvarPDF() {
-    const dados = coletarDados();
-    if (dados) {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      const linhas = doc.splitTextToSize(dados, 180);
-      doc.text(linhas, 10, 20);
-      doc.save("relatorio_turno.pdf");
-    }
-  }
+  // Impressão
+  function imprimirRelatorio() {
+    const dados = coletarDados();
+    if (dados) {
+      let printArea = document.getElementById('printArea');
+      if (!printArea) {
+        printArea = document.createElement('pre');
+        printArea.id = 'printArea';
+        document.body.appendChild(printArea);
+      }
+      printArea.innerText = dados;
+      window.print();
+      mostrarNotificacao('Relatório enviado para impressão!', 'success');
+    }
+  }
 
-  // Limpar formulário
-  function limparFormulario() {
-    document.getElementById("data_turno").value = "";
-    document.getElementById("tipo_turno").value = "";
-    document.getElementById("posto").value = "";
-    document.getElementById("operadores_container").innerHTML = `
-      <div class="item-container">
-        <input type="text" class="operador" placeholder="Nome do operador" onchange="salvarDadosLocal()">
-        <button type="button" class="remove-btn" onclick="removerItem(this); salvarDadosLocal();">Remover</button>
-      </div>
-    `;
-    document.getElementById("bercos").innerHTML = "";
-    localStorage.removeItem('dadosTurno');
-    alert("Formulário limpo com sucesso!");
-  }
+  // PDF
+  async function salvarPDF() {
+    const dados = coletarDados();
+    if (dados) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      
+      // Cabeçalho do PDF
+      doc.setFillColor(30, 60, 114);
+      doc.rect(0, 0, 210, 30, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(18);
+      doc.text('Relatório de Turno Portuário', 105, 17, { align: 'center' });
+      doc.setFontSize(10);
+      doc.text(`Gerado em: ${new Date().toLocaleString('pt-BR')}`, 105, 24, { align: 'center' });
+      
+      // Conteúdo
+      doc.setTextColor(0, 0, 0);
+      const linhas = doc.splitTextToSize(dados, 180);
+      doc.text(linhas, 15, 40);
+      
+      doc.save(`relatorio_turno_${new Date().toISOString().slice(0,10)}.pdf`);
+      mostrarNotificacao('PDF salvo com sucesso!', 'success');
+    }
+  }
 
-  // Salvar dados no localStorage
-  function salvarDadosLocal() {
-    const dadosForm = {
-      data: document.getElementById("data_turno").value,
-      turno: document.getElementById("tipo_turno").value,
-      operadores: Array.from(document.querySelectorAll(".operador")).map(i => i.value),
-      posto: document.getElementById("posto").value,
-      bercos: []
-    };
+  // Limpar formulário
+  function limparFormulario() {
+    if (confirm("Tem certeza que deseja limpar todos os dados do formulário?")) {
+      document.getElementById("data_turno").value = "";
+      document.getElementById("tipo_turno").value = "";
+      document.getElementById("posto").value = "";
+      document.getElementById("operadores_container").innerHTML = `
+        <div class="item-container">
+          <input type="text" class="operador" placeholder="Nome do operador" onchange="salvarDadosLocal()">
+          <button type="button" class="remove-btn" onclick="removerItem(this); salvarDadosLocal();">🗑️ Remover</button>
+        </div>
+      `;
+      document.getElementById("bercos").innerHTML = "";
+      localStorage.removeItem('dadosTurno');
+      mostrarNotificacao('Formulário limpo com sucesso!', 'success');
+    }
+  }
 
-    const bercosElements = document.querySelectorAll(".berco");
-    bercosElements.forEach(bercoDiv => {
-      const berco = bercoDiv.querySelector("h3").innerText;
+  // Sistema de notificações
+  function mostrarNotificacao(mensagem, tipo) {
+    const notification = document.getElementById('notification');
+    notification.textContent = mensagem;
+    notification.className = `notification ${tipo} show`;
+    
+    setTimeout(() => {
+      notification.classList.remove('show');
+    }, 3000);
+  }
+
+  // Salvar dados no localStorage
+  function salvarDadosLocal() {
+    const dadosForm = {
+      data: document.getElementById("data_turno").value,
+      turno: document.getElementById("tipo_turno").value,
+      operadores: Array.from(document.querySelectorAll(".operador")).map(i => i.value),
+      posto: document.getElementById("posto").value,
+      bercos: []
+    };
+
+    const bercosElements = document.querySelectorAll(".berco");
+    bercosElements.forEach(bercoDiv => {
+      const berco = bercoDiv.querySelector("h3").innerText.split(' ')[1];
       const status = document.getElementById(`${berco}_status`).value;
-      
+      
       const bercoData = {
-        berco,
+        berco,
         status,
-        navio: document.getElementById(`${berco}_navio`)?.value || '',
-        viagem: document.getElementById(`${berco}_viagem`)?.value || '',
-        operacao: document.getElementById(`${berco}_operacao`)?.value || '',
-        produtos: Array.from(bercoDiv.querySelectorAll(`.${berco}_produto`)).map(i => i.value),
-        obs: document.getElementById(`${berco}_obs`)?.value || ''
-      };
-      dadosForm.bercos.push(bercoData);
-    });
+        navio: document.getElementById(`${berco}_navio`)?.value || '',
+        viagem: document.getElementById(`${berco}_viagem`)?.value || '',
+        operacao: document.getElementById(`${berco}_operacao`)?.value || '',
+        produtos: Array.from(bercoDiv.querySelectorAll(`.${berco}_produto`)).map(i => i.value),
+        obs: document.getElementById(`${berco}_obs`)?.value || ''
+      };
+      dadosForm.bercos.push(bercoData);
+    });
 
-    localStorage.setItem('dadosTurno', JSON.stringify(dadosForm));
-  }
+    localStorage.setItem('dadosTurno', JSON.stringify(dadosForm));
+  }
 
-  // Carregar dados do localStorage
-  function carregarDadosLocal() {
-    const dadosSalvos = localStorage.getItem('dadosTurno');
-    if (dadosSalvos) {
-      const dados = JSON.parse(dadosSalvos);
-      document.getElementById("data_turno").value = dados.data || "";
-      document.getElementById("tipo_turno").value = dados.turno || "";
-      
-      // Carregar operadores
-      const operadoresContainer = document.getElementById("operadores_container");
-      operadoresContainer.innerHTML = "";
-      if (dados.operadores && dados.operadores.length > 0) {
-        dados.operadores.forEach(operador => {
-          const div = document.createElement("div");
-          div.className = "item-container";
-          div.innerHTML = `
-            <input type="text" class="operador" placeholder="Nome do operador" value="${operador}" onchange="salvarDadosLocal()">
-            <button type="button" class="remove-btn" onclick="removerItem(this); salvarDadosLocal();">Remover</button>
-          `;
-          operadoresContainer.appendChild(div);
-        });
-      } else {
-        operadoresContainer.innerHTML = `
-          <div class="item-container">
-            <input type="text" class="operador" placeholder="Nome do operador" onchange="salvarDadosLocal()">
-            <button type="button" class="remove-btn" onclick="removerItem(this); salvarDadosLocal();">Remover</button>
-          </div>
-        `;
-      }
+  // Carregar dados do localStorage
+  function carregarDadosLocal() {
+    const dadosSalvos = localStorage.getItem('dadosTurno');
+    if (dadosSalvos) {
+      const dados = JSON.parse(dadosSalvos);
+      document.getElementById("data_turno").value = dados.data || "";
+      document.getElementById("tipo_turno").value = dados.turno || "";
+      
+      // Carregar operadores
+      const operadoresContainer = document.getElementById("operadores_container");
+      operadoresContainer.innerHTML = "";
+      if (dados.operadores && dados.operadores.length > 0) {
+        dados.operadores.forEach(operador => {
+          const div = document.createElement("div");
+          div.className = "item-container";
+          div.innerHTML = `
+            <input type="text" class="operador" placeholder="Nome do operador" value="${operador}" onchange="salvarDadosLocal()">
+            <button type="button" class="remove-btn" onclick="removerItem(this); salvarDadosLocal();">🗑️ Remover</button>
+            `;
+          operadoresContainer.appendChild(div);
+        });
+      } else {
+        operadoresContainer.innerHTML = `
+          <div class="item-container">
+            <input type="text" class="operador" placeholder="Nome do operador" onchange="salvarDadosLocal()">
+            <button type="button" class="remove-btn" onclick="removerItem(this); salvarDadosLocal();">🗑️ Remover</button>
+          </div>
+        `;
+      }
 
-      // Carregar posto e berços
-      document.getElementById("posto").value = dados.posto || "";
-      
-      if (dados.posto) {
-        mostrarBerços();
-        
-        dados.bercos.forEach(bercoData => {
-          const bercoStatusSelect = document.getElementById(`${bercoData.berco}_status`);
-          if (bercoStatusSelect) {
-            bercoStatusSelect.value = bercoData.status;
-            toggleBercoStatus(bercoStatusSelect);
-          }
-          
-          if (bercoData.status !== 'vago') {
-            if (document.getElementById(`${bercoData.berco}_navio`)) {
-              document.getElementById(`${bercoData.berco}_navio`).value = bercoData.navio;
-              document.getElementById(`${bercoData.berco}_viagem`).value = bercoData.viagem;
-              document.getElementById(`${bercoData.berco}_operacao`).value = bercoData.operacao;
-              document.getElementById(`${bercoData.berco}_obs`).value = bercoData.obs;
+      // Carregar posto e berços
+      document.getElementById("posto").value = dados.posto || "";
+      
+      if (dados.posto) {
+        mostrarBerços();
+        
+        // Aguardar um pouco para garantir que os berços foram criados
+        setTimeout(() => {
+          dados.bercos.forEach(bercoData => {
+            const bercoStatusSelect = document.getElementById(`${bercoData.berco}_status`);
+            if (bercoStatusSelect) {
+              bercoStatusSelect.value = bercoData.status;
+              toggleBercoStatus(bercoStatusSelect);
+            }
+            
+            if (bercoData.status !== 'vago') {
+              if (document.getElementById(`${bercoData.berco}_navio`)) {
+                document.getElementById(`${bercoData.berco}_navio`).value = bercoData.navio;
+                document.getElementById(`${bercoData.berco}_viagem`).value = bercoData.viagem;
+                document.getElementById(`${bercoData.berco}_operacao`).value = bercoData.operacao;
+                document.getElementById(`${bercoData.berco}_obs`).value = bercoData.obs;
 
-              const produtosContainer = document.getElementById(`${bercoData.berco}_produtos_container`);
-              produtosContainer.innerHTML = "";
-              bercoData.produtos.forEach(produto => {
-                const div = document.createElement("div");
-                div.className = "item-container";
-                div.innerHTML = `
-                  <input type="text" class="${bercoData.berco}_produto" placeholder="Produto transferido" value="${produto}" onchange="salvarDadosLocal()">
-                  <button type="button" class="remove-btn" onclick="removerItem(this)">Remover</button>
-                `;
-                produtosContainer.appendChild(div);
-              });
-            }
-          }
-        });
-      }
-    }
-  }
+                const produtosContainer = document.getElementById(`${bercoData.berco}_produtos_container`);
+                if (produtosContainer) {
+                  produtosContainer.innerHTML = "";
+                  bercoData.produtos.forEach(produto => {
+                    const div = document.createElement("div");
+                    div.className = "item-container";
+                    div.innerHTML = `
+                      <input type="text" class="${bercoData.berco}_produto" placeholder="Produto transferido" value="${produto}" onchange="salvarDadosLocal()">
+                      <button type="button" class="remove-btn" onclick="removerItem(this)">🗑️ Remover</button>
+                    `;
+                    produtosContainer.appendChild(div);
+                  });
+                }
+              }
+            }
+          });
+        }, 100);
+      }
+      mostrarNotificacao('Dados anteriores carregados com sucesso!', 'success');
+    }
+  }
 </script>
 </body>
 </html>
